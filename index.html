@@ -99,6 +99,36 @@
     }
 
     input[type="text"],
+    .item-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .item-action-btn {
+      border: 1px solid #c8dfc8;
+      border-radius: 8px;
+      background: transparent;
+      color: #6b9e7a;
+      font-size: 12px;
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .item-action-btn:hover {
+      background: #e8f4e8;
+    }
+
+    .item-action-btn--danger {
+      color: #b07070;
+      border-color: #e0c0c0;
+    }
+
+    .item-action-btn--danger:hover {
+      background: #fdf0f0;
+    }
+
     textarea {
       width: 100%;
       border: 1px solid #d3d8d3;
@@ -675,7 +705,6 @@
 
       <section class="panel timeline-card">
         <div class="timeline-header">
-          <h2 class="timeline-title">Oasis 记录</h2>
           <div class="filter-wrap">
             <input id="startDate" class="date-input" type="date" aria-label="开始日期">
             <input id="endDate" class="date-input" type="date" aria-label="结束日期">
@@ -965,6 +994,38 @@
           image.alt = "记录图片";
           li.appendChild(image);
         }
+
+        const itemActions = document.createElement("div");
+        itemActions.className = "item-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "item-action-btn";
+        editBtn.textContent = "编辑";
+        editBtn.addEventListener("click", () => {
+          const newText = prompt("编辑记录内容：", record.content);
+          if (newText === null) return;
+          const records = loadRecords();
+          const idx = records.findIndex(r => r.id === record.id);
+          if (idx !== -1) {
+            records[idx].content = newText.trim();
+            saveRecords(records);
+            renderCurrentRecords();
+          }
+        });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "item-action-btn item-action-btn--danger";
+        deleteBtn.textContent = "删除";
+        deleteBtn.addEventListener("click", () => {
+          if (!confirm("确定删除这条记录？")) return;
+          const records = loadRecords().filter(r => r.id !== record.id);
+          saveRecords(records);
+          renderCurrentRecords();
+        });
+
+        itemActions.appendChild(editBtn);
+        itemActions.appendChild(deleteBtn);
+        li.appendChild(itemActions);
 
         timelineEl.appendChild(li);
       });
